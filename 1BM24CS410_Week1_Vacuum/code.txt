@@ -1,0 +1,59 @@
+# Environment definition
+import random
+
+class Environment:
+    def __init__(self):
+        self.rooms = {'A': random.choice(['Clean', 'Dirty']),
+                      'B': random.choice(['Clean', 'Dirty'])}
+
+# Simple Reflex Agent
+def simple_reflex_agent(location, status):
+    if status == 'Dirty':
+        return 'Suck'
+    elif location == 'A':
+        return 'Right'
+    elif location == 'B':
+        return 'Left'
+
+# Goal-Based Agent
+def goal_based_agent(location, status, goal):
+    if status != goal:
+        return 'Suck'
+    elif location == 'A':
+        return 'Right'
+    elif location == 'B':
+        return 'Left'
+
+def run_vacuum_cleaner(agent_type='simple'):
+    env = Environment()
+    location = random.choice(['A', 'B'])
+
+    print(f"Initial Environment: {env.rooms}")
+    print(f"Starting at location: {location}")
+
+    for _ in range(4):  # Run 4 steps
+        status = env.rooms[location]
+        print(f"\nAgent is at {location} | Status: {status}")
+
+        if agent_type == 'simple':
+            action = simple_reflex_agent(location, status)
+        else:
+            action = goal_based_agent(location, status, 'Clean')
+
+        print(f"Action: {action}")
+
+        if action == 'Suck':
+            env.rooms[location] = 'Clean'
+        elif action == 'Right':
+            location = 'B'
+        elif action == 'Left':
+            location = 'A'
+
+    print(f"\nFinal Environment: {env.rooms}")
+
+# Run both versions
+print("=== Simple Reflex Agent ===")
+run_vacuum_cleaner(agent_type='simple')
+
+print("\n=== Goal-Based Agent ===")
+run_vacuum_cleaner(agent_type='goal')
