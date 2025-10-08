@@ -1,0 +1,44 @@
+# USN_Week7_FOL_Unification.py
+
+def unify(x, y, subs={}):
+    if subs is None:
+        return None
+    elif x == y:
+        return subs
+    elif isinstance(x, str) and x.islower():  # variable
+        return unify_var(x, y, subs)
+    elif isinstance(y, str) and y.islower():  # variable
+        return unify_var(y, x, subs)
+    elif isinstance(x, list) and isinstance(y, list) and len(x) == len(y):
+        for a, b in zip(x, y):
+            subs = unify(a, b, subs)
+        return subs
+    else:
+        return None
+
+def unify_var(var, x, subs):
+    if var in subs:
+        return unify(subs[var], x, subs)
+    elif x in subs:
+        return unify(var, subs[x], subs)
+    elif occurs_check(var, x, subs):
+        return None
+    else:
+        subs[var] = x
+        return subs
+
+def occurs_check(var, x, subs):
+    if var == x:
+        return True
+    elif isinstance(x, list):
+        return any(occurs_check(var, xi, subs) for xi in x)
+    elif x in subs:
+        return occurs_check(var, subs[x], subs)
+    return False
+
+# Example:
+expr1 = ["Eats", "x", "Apple"]
+expr2 = ["Eats", "Riya", "y"]
+
+result = unify(expr1, expr2, {})
+print("Substitution Set:", result)

@@ -1,0 +1,41 @@
+# USN_Week6_PropositionalLogic_TruthTableEnumeration.py
+
+import itertools
+
+# Function to evaluate a propositional logic expression
+def evaluate(expr, model):
+    # Replace symbols in the expression with their truth values
+    for symbol, value in model.items():
+        expr = expr.replace(symbol, str(value))
+    
+    # Replace logical operators with Python equivalents
+    expr = expr.replace("and", " and ")
+    expr = expr.replace("or", " or ")
+    expr = expr.replace("not", " not ")
+    expr = expr.replace("->", " <= ")
+    expr = expr.replace("<->", " == ")
+    
+    # Evaluate and return the truth value
+    return eval(expr)
+
+# Function to check entailment using Truth Table Enumeration
+def truth_table_entails(KB, query, symbols):
+    for values in itertools.product([True, False], repeat=len(symbols)):
+        model = dict(zip(symbols, values))
+        kb_value = all(evaluate(sentence, model) for sentence in KB)
+        if kb_value and not evaluate(query, model):
+            return False
+    return True
+
+# Example Knowledge Base and Query
+KB = ["(not P) or Q", "P"]  # KB = {P -> Q, P}
+query = "Q"
+symbols = ["P", "Q"]
+
+# Call the function
+result = truth_table_entails(KB, query, symbols)
+
+# Print the results
+print("Knowledge Base:", KB)
+print("Query:", query)
+print("Result:", "YES, KB entails Query" if result else "NO, KB does not entail Query")
