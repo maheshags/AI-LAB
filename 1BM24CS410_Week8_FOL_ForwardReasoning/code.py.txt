@@ -1,0 +1,37 @@
+# --- Forward Chaining Example in FOL ---
+
+# Knowledge base (rules + facts)
+rules = [
+    ("Raining", "Wet"),          # If Raining(x) then Wet(x)
+    ("Wet", "Slippery")          # If Wet(x) then Slippery(x)
+]
+
+facts = {"Raining"}  # Initial known facts
+goal = "Slippery"    # Query to prove
+
+def forward_chaining(rules, facts, goal):
+    inferred = set()
+    added = True
+
+    print("Initial Facts:", facts)
+    while added:
+        added = False
+        for rule in rules:
+            premise, conclusion = rule
+            if premise in facts and conclusion not in facts:
+                print(f"Rule applied: {premise} → {conclusion}")
+                facts.add(conclusion)
+                inferred.add(conclusion)
+                added = True
+                if conclusion == goal:
+                    print("\n✅ Goal reached!")
+                    return True
+    print("\n❌ Goal not reached.")
+    return False
+
+
+# --- Run Forward Chaining ---
+result = forward_chaining(rules, facts, goal)
+
+print("\nFinal Facts:", facts)
+print("Goal:", goal, "=>", "Proved ✅" if result else "Not proved ❌")
