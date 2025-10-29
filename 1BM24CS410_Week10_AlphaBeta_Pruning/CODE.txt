@@ -1,0 +1,55 @@
+class Node:
+    def __init__(self, name, children=None, value=None):
+        self.name = name
+        self.children = children or []
+        self.value = value  # used only for leaf nodes
+
+    def is_terminal(self):
+        return len(self.children) == 0
+
+    def evaluate(self):
+        return self.value
+
+    def get_children(self):
+        return self.children
+
+
+def alpha_beta(node, depth, alpha, beta, maximizing_player):
+    if depth == 0 or node.is_terminal():
+        return node.evaluate()
+
+    if maximizing_player:
+        value = float('-inf')
+        for child in node.get_children():
+            value = max(value, alpha_beta(child, depth - 1, alpha, beta, False))
+            alpha = max(alpha, value)
+            if alpha >= beta:
+                break  # β cutoff
+        return value
+    else:
+        value = float('inf')
+        for child in node.get_children():
+            value = min(value, alpha_beta(child, depth - 1, alpha, beta, True))
+            beta = min(beta, value)
+            if beta <= alpha:
+                break  # α cutoff
+        return value
+
+
+# --- Build Example Tree ---
+# Leaves
+B1 = Node("B1", value=3)
+B2 = Node("B2", value=5)
+C1 = Node("C1", value=6)
+C2 = Node("C2", value=9)
+
+# Internal nodes
+B = Node("B", children=[B1, B2])
+C = Node("C", children=[C1, C2])
+
+# Root node (max)
+A = Node("A", children=[B, C])
+
+# --- Run Alpha-Beta Search ---
+best_value = alpha_beta(A, depth=3, alpha=float('-inf'), beta=float('inf'), maximizing_player=True)
+print("Best value at root (A):", best_value)

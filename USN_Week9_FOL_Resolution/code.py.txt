@@ -1,0 +1,44 @@
+from sympy import symbols
+from sympy.logic.boolalg import Or, And, Not
+from sympy.logic.inference import satisfiable
+
+# --- Define Predicates ---
+Likes = lambda x, y: symbols(f"Likes_{x}_{y}")
+Eats = lambda x, y: symbols(f"Eats_{x}_{y}")
+Food = lambda x: symbols(f"Food_{x}")
+Alive = lambda x: symbols(f"Alive_{x}")
+Killed = lambda x: symbols(f"Killed_{x}")
+
+# --- Define Constants ---
+John, Anil, Harry, Apple, Vegetables, Peanuts = "John", "Anil", "Harry", "Apple", "Vegetables", "Peanuts"
+
+# --- Knowledge Base (in CNF form) ---
+
+# 1. John likes all kinds of food -> For simplicity, add for known foods
+KB = [
+    Likes(John, Apple),
+    Likes(John, Vegetables),
+    Likes(John, Peanuts),  # we'll negate this later for resolution
+    Food(Apple),
+    Food(Vegetables),
+    Or(Not(Eats(Anil, Peanuts)), Not(Not(Killed(Anil))), Food(Peanuts)),
+    Eats(Anil, Peanuts),
+    Alive(Anil),
+    Or(Not(Alive(Anil)), Not(Eats(Harry, Peanuts)), Eats(Harry, Peanuts)),  # Harry eats what Anil eats
+    Or(Not(Alive(Anil)), Not(Killed(Anil))),  # Alive -> not killed
+    Or(Not(Killed(Anil)), Alive(Anil))        # Not killed -> alive
+]
+
+# --- Negate the Goal ---
+goal = Not(Likes(John, Peanuts))
+
+# --- Combine KB + Negated Goal ---
+clauses = KB + [goal]
+
+# --- Resolution Test: If contradiction found => proven ---
+result = satisfiable(And(*clauses))
+
+if not result:
+    print("✅ The goal 'John likes peanuts' is PROVED by resolution (contradiction found).")
+else:
+    print("❌ The goal could not be proved. KB is satisfiable with:", result)
